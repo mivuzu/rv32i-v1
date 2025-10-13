@@ -11,8 +11,6 @@ Tested instruction by instruction during implementation, as well as with small p
 - v3: ISA expansion to RV32GC
 - v4: 64-bit (RV64GC)
 
-Further improvements will most likely be microarchitecture focused, like adding out-of-order execution, branch prediction, pipeline improvements, etc.
-
 ## Highlights
 
 - Target: Lattice ECP5
@@ -106,7 +104,7 @@ will be generated and loaded.
 
 - Core: RV32I multicycle controller + ALU + regfile + memory load/store
 - Memory subsystem: parameterized DP16KD bank array (208 × 2 KiB ≈ 416 KiB ≈ ~425 KB decimal)
-- MMIO: UART mapped into the highest 4 KiB of address space
+- MMIO UART: mapped into the highest 4 KiB of address space
 - Boot flow: UART memory-init, send a command with `op=11` to start at PC=0
 - Utilization is roughly 7k luts. See `obj/npr_report.json` for further utilization info.
 
@@ -114,12 +112,6 @@ will be generated and loaded.
 
 - No `fence/*`, `ecall`, `ebreak`, `pause`
 - No pipeline, performance is intentionally modest
-
-## Future Work
-
-- v2: 5 stage pipeline, hazard handling, wider memory datapath + burst transfers for throughput
-- v3: RV32GC
-- v4: RV64GC
 
 ## Contributing
 
