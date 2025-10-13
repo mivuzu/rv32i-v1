@@ -2,6 +2,15 @@
 
 Personal design of a minimal RISC-V 32-bit soft CPU for Lattice ECP5, first iteration, written to be easy to port and build upon. It currently implements the base integer ISA only, hence the name (excluding memory-ordering and environment instructions: `fence`, `fence.tso`, `pause`, `ecall`, `ebreak`).
 
+## Roadmap
+
+- v1 (this): RV32I, multicycle, MMIO UART, host-side memory init
+- v2: pipelined core, wider/faster memory module
+- v3: ISA expansion to RV32GC
+- v4: 64-bit (RV64GC)
+
+Tested instruction by instruction during implementation, as well as with small programs, however not yet tested extensively. Use at your own risk and please report issues.
+
 ## Highlights
 
 - Target: Lattice ECP5
@@ -12,15 +21,6 @@ Personal design of a minimal RISC-V 32-bit soft CPU for Lattice ECP5, first iter
 - Host link: UART driven memory init+control protocol
 
 Developed on the ECP5 Evaluation Board. With minor changes, particularly pin constraints and memory size, it should run on most ECP5 boards.
-
-## Roadmap
-
-- v1 (this): RV32I, multicycle, MMIO UART, host-side memory init
-- v2: pipelined core, wider/faster memory module
-- v3: ISA expansion to RV32GC
-- v4: 64-bit (RV64GC)
-
-Tested instruction by instruction during implementation, as well as with small programs, however not yet tested extensively. Use at your own risk and please report issues.
 
 ## Basic Operation
 
