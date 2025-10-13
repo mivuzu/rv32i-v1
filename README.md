@@ -24,8 +24,8 @@ As for writes, the FPGA will expect an additional `size` bytes to complete the o
 
 If `op` is either `10` or  `11`, only a single byte will issue the particular operation.<br/>
 With CPU register reads (`op=='b10`), 4 bytes will be sent, the contents of the specified register.<br/>
-Operation `10` is rather self explanatory. 
+Operation `10` is rather self explanatory.
 
-Upon starting execution the FPGA will switch to CPU mode, and any further commands will be ignored, instead any data sent over UART while the CPU is executing will be stored in memory for the CPU to access, and note that the CPU may also send data of its own (see UART interface bellow)
+Upon starting execution the FPGA will switch to CPU mode, executing instructions starting at address `0`, and any further commands will be ignored. Instead any data sent over UART while the CPU is executing will be stored in memory for the CPU to access, and note that the CPU may also send data of its own (see UART interface bellow). 
 
 If the CPU reaches a `0` instruction (first 7 bits are 0, most likely unwritten memory), the FPGA will switch back to memory initialization mode.
