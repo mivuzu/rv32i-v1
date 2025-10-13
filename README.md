@@ -4,9 +4,9 @@ First version of my personal design of a RISC-V 32-bit core.
 It supports only the base integer instruction set (minus the memory ordering and environment instructions, that is: `fence, fence.tso, pause, ecall` and `ebreak`), hence the repository name.
 It's built for the ECP5 using the yosys+nextpnr toolchain, and while I've worked on it with ECP5 Evaluation board from Lattice, it should work on basically any ECP5 with only minor tweaks, like setting the correct UART ports and changing the memory size to suit the target model.
 
-The CPU itself has a simple multicyle microarchitecture, no pipelining, nothing fancy. This is why I've put V1 on the name, I intend to make a pipelined design on version 2, as well as making the memory module wider and faster as to speed things up. In version 3 I'll probably expand the instruction set of rv32gc, On V4 I'll most likely expand to 64 bits. 
+The CPU itself has a simple multicyle microarchitecture, no pipelining, nothing fancy. This is why I've put V1 on the name, I intend to make a pipelined design on version 2, as well as making the memory module wider and faster as to speed things up. In version 3 I'll probably expand the instruction set to rv32gc, On V4 I'll most likely expand to 64 bits. 
 
-As it stands built for my particular model, it has a 425KB memory, from the on chip memory banks. 
+As it stands built for my particular model, it has a 425KB memory, from the on chip memory banks (208 2048-byte memory banks, in ECP5 lingo they're called DP16KD). 
 I've also added an MMIO UART interface for the CPU, and of course the machine code for the CPU is loaded onto memory via UART.
 
 I've not tested it extensively, however the tests I've done run as expected and I tested each instruction thoroughly as I wrote it. Still use at your own risk and please do tell me if you find any bugs.
@@ -51,3 +51,5 @@ Data is stored in the order it was received, i.e `0x67803` would be the first by
 The CPU may overwrite the received counter, for example if it doesn't care about the stored data it may write 0 to it and received data will start to be overwritten.
 
 The UART interface is 115200 baud, the code for it is not present on this codebase, if you notice the directory specified for it in the Makefile is a link.<br/> I don't think it's relevant for this project, however the final bitstream in the `obj/` directory does contain it. I may commit that directory in the future :p.
+
+As you may have realized the UART interface takes the last 4KiB of memory, this is because it's directly mapped to the last 2 DP16KDs that the memory module uses. This makes things easier to port over if the memory size is changed, the amount of memory banks is specified in a parameter in `memory.v`.
