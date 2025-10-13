@@ -72,11 +72,6 @@ The UART interface occupies the last 4 KiB of RAM (wired to the last two DP16KDs
 - The CPU may overwrite the RX count, for example, write `0` so new data overwrites old.
 - Baud: 115200, see `lib/hdl/uart.v` to change baud rate.
 
-## Porting Notes
-
-- UART and clock pins: update constraints for your board on `lib/pins.lpf`
-- Memory size: set the number of DP16KD banks in `memory.v`.
-
 ## Build & Run
 
 Commands here are indicative, adapt to your board toolchain. If you run them as is, without changing the Makefile or project at all, a bitstream for the ECP5 Ev. Board 
@@ -107,8 +102,3 @@ will be generated and loaded.
 - MMIO UART: mapped into the highest 4 KiB of address space
 - Boot flow: UART memory-init, send a command with `op=11` to start at PC=0
 - Utilization is roughly 7k luts. See `obj/npr_report.json` for further utilization info.
-
-## Known Limitations
-
-- No `fence/*`, `ecall`, `ebreak`, `pause`
-- No pipeline, performance is intentionally modest
