@@ -11,6 +11,8 @@ Tested instruction by instruction during implementation, as well as with small p
 - v3: ISA expansion to RV32GC
 - v4: 64-bit (RV64GC)
 
+Further improvements will most likely be microarchitecture focused, like adding out-of-order execution, branch prediction, pipeline improvements, etc.
+
 ## Highlights
 
 - Target: Lattice ECP5
