@@ -50,4 +50,4 @@ Upon finishing a transfer, `0x67000` will be set to `0x80`
 Data is stored in the order it was received, i.e `0x67803` would be the first byte received.
 The CPU may overwrite the received counter, for example if it doesn't care about the stored data it may write 0 to it and received data will start to be overwritten.
 
-The UART interface is 115200 baud, the code for it is not present on this codebase, if you notice the directory specified for it in the Makefile is a link. I don't think it's relevant for this project however the final bitstream of the project on the `obj/` directory does contain it of course.
+The UART interface is 115200 baud, the code for it is not present on this codebase, if you notice the directory specified for it in the Makefile is a link. I don't think it's relevant for this project, however the final bitstream of the project on the `obj/` directory does contain it of course.
