@@ -48,10 +48,10 @@ Operations:
 | 10  | Read CPU register `{command[3], command[7:4]}` (sends 4 bytes) |
 | 11  | Start CPU execution                                          |
 
-Notes:
+Note that
 
-- Reads: FPGA streams bytes from low to high address.
-- Writes: host must send `size` additional bytes, written from `base` upward.
+- For reads the FPGA streams bytes from low to high address.
+- For writes the host must send `size` additional bytes, written from `base` upward.
 - For `10` / `11`, a single byte suffices to issue the operation.
 - During CPU mode, commands are ignored and incoming UART bytes are instead buffered to memory for the CPU.
 
