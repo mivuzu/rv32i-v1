@@ -112,7 +112,3 @@ will be generated and loaded.
 
 - No `fence/*`, `ecall`, `ebreak`, `pause`
 - No pipeline, performance is intentionally modest
-
-## Contributing
-
-Issues and PRs are welcome, especially board port contributions, verification tests, program runs, stress testing, and just any suggestion :p
