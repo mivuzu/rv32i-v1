@@ -30,9 +30,10 @@ At power-up the FPGA enters memory-initialization mode:
 - Starting execution switches the system into CPU mode.
 - Encountering an all-zero instruction (first 7 bits zero, likely unwritten memory) returns to memory-init mode.
 
-### Host Command Format (UART)
+### Host Command Format
 
-General command form (bit layout):
+Works over UART.<br/>
+General bit layout of a command:
 
     [ Transfer Size (size) – 19 bits ] | [ Base Address (base) – 19 bits ] | [ Operation (op) – 2 bits ]
 
