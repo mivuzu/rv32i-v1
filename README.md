@@ -95,10 +95,3 @@ will be generated and loaded.
     lib/            # pin constraints and hdl I reuse often (UART, ALU and PLL).
     tools/          # host-side UART loader/scripts
 
-## Design Overview
-
-- Core: RV32I multicycle controller + ALU + regfile + memory load/store
-- Memory subsystem: parameterized DP16KD bank array (208 × 2 KiB ≈ 416 KiB ≈ ~425 KB decimal)
-- MMIO UART: mapped into the highest 4 KiB of address space
-- Boot flow: UART memory-init, send a command with `op=11` to start at PC=0
-- Utilization is roughly 7k luts. See `obj/npr_report.json` for further utilization info.
