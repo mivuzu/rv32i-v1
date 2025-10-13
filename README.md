@@ -11,7 +11,7 @@ Tested instruction by instruction during implementation, as well as with small p
 - v3: ISA expansion to RV32GC
 - v4: 64-bit (RV64GC)
 
-## Highlights
+## Summary
 
 - Target: Lattice ECP5
 - Toolchain: yosys+nextpnr
