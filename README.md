@@ -13,14 +13,14 @@ Personal design of a minimal RISC-V 32-bit soft CPU for Lattice ECP5, first iter
 
 Developed on the ECP5 Evaluation Board. With minor changes, particularly pin constraints and memory size, it should run on most ECP5 boards.
 
-## Status / Roadmap
+## Roadmap
 
 - v1 (this): RV32I, multicycle, MMIO UART, host-side memory init
 - v2: pipelined core, wider/faster memory module
 - v3: ISA expansion to RV32GC
 - v4: 64-bit (RV64GC)
 
-Tested instruction by instruction during implementation, however not yet stress-tested. Use at your own risk and please report issues.
+Tested instruction by instruction during implementation, as well as with small programs, however not yet tested extensively. Use at your own risk and please report issues.
 
 ## Basic Operation
 
@@ -76,9 +76,9 @@ The UART interface occupies the last 4 KiB of RAM (wired to the last two DP16KDs
 - UART and clock pins: update constraints for your board on `lib/pins.lpf`
 - Memory size: set the number of DP16KD banks in `memory.v`.
 
-## Build & Run (example flow)
+## Build & Run
 
-Commands here are indicative, adapt to your board toolchain. If you run them as is, without changing the Makefile or project all, a bitstream for the ECP5 Ev. Board 
+Commands here are indicative, adapt to your board toolchain. If you run them as is, without changing the Makefile or project at all, a bitstream for the ECP5 Ev. Board 
 will be generated and loaded.
 
 1) Install yosys, nextpnr-ecp5, ecppack and openFPGALoader (or whatever tools your toolchain requires and modify Makefile).
@@ -95,7 +95,7 @@ will be generated and loaded.
 
 ## Repository Structure
     src/            # core, memory, mmio
-    obj/            # build artifacts (bitstream here contains the UART block)
+    obj/            # build artifacts
     lib/            # pin constraints and hdl I reuse often (UART, ALU and PLL).
     tools/          # host-side UART loader/scripts (not yet uploaded)
 
@@ -122,5 +122,6 @@ will be generated and loaded.
 
 Issues and PRs are welcome, especially:
 - Board port contributions
-- Verification tests/
-- 
+- Verification tests
+- Program runs
+- Stress testing
