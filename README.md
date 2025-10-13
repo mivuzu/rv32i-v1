@@ -52,4 +52,4 @@ The CPU may overwrite the received counter, for example if it doesn't care about
 
 The UART interface is 115200 baud, the code for it is not present on this codebase, if you notice the directory specified for it in the Makefile is a link.<br/> I don't think it's relevant for this project, however the final bitstream in the `obj/` directory does contain it. I may commit that directory in the future :p.
 
-As you may have realized the UART interface takes the last 4KiB of memory, this is because it's directly mapped to the last 2 DP16KDs that the memory module uses. This makes things easier to port over if the memory size is changed, the amount of memory banks is specified in a parameter in `memory.v`.
+As you may have realized the UART interface takes the last 4KiB of memory, this is because it's directly connected to the last 2 DP16KDs that the memory module uses. This makes things easier to port over if the memory size is changed, the amount of memory banks is specified in a parameter in `memory.v`.
