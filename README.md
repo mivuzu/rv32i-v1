@@ -26,7 +26,7 @@ Developed on the ECP5 Evaluation Board. With minor changes, particularly pin con
 
 ## Basic Operation
 
-At power-up the FPGA enters memory-initialization mode:
+At power up the FPGA enters memory-initialization mode:
 
 - A PC can read/write memory and control the CPU over UART using compact commands.
 - Starting execution switches the system into CPU mode.
