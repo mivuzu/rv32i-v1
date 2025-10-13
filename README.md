@@ -16,7 +16,7 @@ I have not extensively tested it, however I tested it instruction by instruction
 - Target: Lattice ECP5
 - Toolchain: yosys+nextpnr
 - Microarchitecture: simple multicycle, no pipeline.
-- Memory: 416 KiB on-chip RAM (208 × 2048-byte banks; ECP5 “DP16KD” blocks)
+- Memory: 416 KiB on-chip RAM (208 2048-byte memory banks; ECP5 “DP16KD” blocks)
 - I/O: MMIO UART (115200 baud)
 - Host link: UART driven memory init+control protocol
 
