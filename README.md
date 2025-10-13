@@ -70,7 +70,7 @@ The UART interface occupies the last 4 KiB of RAM (wired to the last two DP16KDs
 | 0x67801–0x67802   | RX count (16-bit unsigned, increments per received byte, overflow after 2045)            |
 | 0x67803–0x67FFF   | 2045-byte RX buffer (received data, may wrap/overwrite)                                  |
 
-- RX bytes are ordered as received, i.e `0x67803` holds the first byte. TX bytes are also transfer from lowest to highest.
+- RX bytes are ordered as received, i.e `0x67803` holds the first byte. TX bytes are also transferred from lowest to highest.
 - The CPU may overwrite the RX count, e.g., write `0` so new data overwrites old.
 - Baud: 115200, see `lib/hdl/uart.v` to change baud rate.
 
