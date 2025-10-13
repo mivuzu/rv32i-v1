@@ -2,7 +2,7 @@
 
 Personal design of a minimal RISC-V 32-bit soft CPU for Lattice ECP5, first iteration, written to be easy to port and build upon. It currently implements the base integer ISA only, hence the name (excluding memory-ordering and environment instructions: `fence`, `fence.tso`, `pause`, `ecall`, `ebreak`).
 
-Tested instruction by instruction during implementation, as well as with small programs, however not yet extensively tested. Use at your own risk and please do report bugs.
+Tested instruction by instruction during implementation, as well as with small programs, however not yet extensively tested. Use at your own risk and please do report issues.
 
 ## Roadmap
 
