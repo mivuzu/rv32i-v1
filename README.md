@@ -98,7 +98,7 @@ will be generated and loaded.
     src/            # core, memory, mmio
     obj/            # build artifacts
     lib/            # pin constraints and hdl I reuse often (UART, ALU and PLL).
-    tools/          # host-side UART loader/scripts (not yet uploaded)
+    tools/          # host-side UART loader/scripts
 
 ## Design Overview
 
