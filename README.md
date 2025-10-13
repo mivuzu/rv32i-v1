@@ -1,55 +1,125 @@
 # rv32i-v1
-First version of my personal design of a RISC-V 32-bit core.
 
-It supports only the base integer instruction set (minus the memory ordering and environment instructions, that is: `fence, fence.tso, pause, ecall` and `ebreak`), hence the repository name.
-It's built for the ECP5 using the yosys+nextpnr toolchain, and while I've worked on it with ECP5 Evaluation board from Lattice, it should work on basically any ECP5 with only minor tweaks, like setting the correct UART ports and changing the memory size to suit the target model.
+A minimal RISC-V 32-bit (RV32I) soft CPU for Lattice ECP5, written to be easy to understand and port. It currently implements the base integer ISA only (excluding memory-ordering and environment instructions: `fence`, `fence.tso`, `pause`, `ecall`, `ebreak`), hence the name.
 
-The CPU itself has a simple multicyle microarchitecture, no pipelining, nothing fancy. This is why I've put V1 on the name, I intend to make a pipelined design on version 2, as well as making the memory module wider and faster as to speed things up. In version 3 I'll probably expand the instruction set to rv32gc, On V4 I'll most likely expand to 64 bits. 
+## Highlights
 
-As it stands built for my particular model, it has a 425KB memory, from the on chip memory banks (208 2048-byte memory banks, in ECP5 lingo they're called DP16KD). 
-I've also added an MMIO UART interface for the CPU, and of course the machine code for the CPU is loaded onto memory via UART.
+- Target: Lattice ECP5
+- Toolchain: yosys+nextpnr
+- Microarchitecture: simple multicycle, no pipeline.
+- Memory: ≈416 KiB on-chip RAM (208 × 2048-byte banks; ECP5 “DP16KD” blocks)
+- I/O: MMIO UART (115200 baud)
+- Host link: UART-driven memory init + control protocol
 
-I've not tested it extensively, however the tests I've done run as expected and I tested each instruction thoroughly as I wrote it. Still use at your own risk and please do tell me if you find any bugs.
+> Developed on the ECP5 Evaluation Board (Lattice). With minor tweaks (UART pins, memory count), it should run on most ECP5 boards.
 
-## Basic Functionality
-At first the FPGA will start in memory initialization mode, in this mode memory writes and reads can be done from a PC via UART. 5-byte commands may be issued to specify the desired operation (or only single byte commands if the operation is not memory related). The general form of a command is the following:
+## Status / Roadmap
 
-\[Transfer Size (`size`) - 19 bits]|\[Base Address (`base`) - 19 bits\]|\[Operation (`op`) - 2 bits\]
+- v1 (this): RV32I, multicycle, MMIO UART, host-side memory init
+- v2: pipelined core, wider/faster memory module
+- v3: ISA expansion to RV32GC
+- v4: 64-bit (RV64GC)
 
-As you would expect there are only 4 posible operations;
+Tested instruction-by-instruction during implementation; not yet stress-tested. Use at your own risk and please report issues.
 
-`00`: Memory read of `size` bytes starting at address `base`<br/>
-`01`: Memory write of `size` bytes starting at address `base`<br/>
-`10`: Read value of CPU register `{command[3],command[7:4]}`<br/>
-`11`: Start CPU execution
+## Basic Operation
 
-For memory reads the FPGA will simply transfer requested memory section, from lowest to highest byte.<br/>
-As for writes, the FPGA will expect an additional `size` bytes to complete the operation, writing each one to memory starting at address `base`
+At power-up the FPGA enters memory-initialization mode:
 
-If `op` is either `10` or  `11`, only a single byte will issue the particular operation.<br/>
-With CPU register reads (`op=='b10`), 4 bytes will be sent, the contents of the specified register.<br/>
-Operation `10` is rather self explanatory.
+- A PC can read/write memory and control the CPU over UART using compact commands.
+- Starting execution switches the system into CPU mode.
+- Encountering an all-zero instruction (first 7 bits zero, likely unwritten memory) returns to memory-init mode.
 
-Upon starting execution the FPGA will switch to CPU mode, executing instructions starting at address `0`, and any further commands will be ignored. Instead any data sent over UART while the CPU is executing will be stored in memory for the CPU to access, and note that the CPU may also send data of its own (see UART interface bellow). 
+### Host Command Format (UART)
 
-If the CPU reaches a `0` instruction (first 7 bits are 0, most likely unwritten memory), the FPGA will switch back to memory initialization mode.
+General command form (bit layout):
 
-## UART Interface
-As I mentioned there's an MMIO interface for the CPU to access the UART modules, it's mapped this way:
+    [ Transfer Size (size) – 19 bits ] | [ Base Address (base) – 19 bits ] | [ Operation (op) – 2 bits ]
 
-`0x67000`: Start transfer flags, if first bit is set to one a transfer will start.<br/>
-`0x67001-0x67002`: Tranfer size, 16 bit unsigned integer, starting at 0x67001.<br/>
-`0x67003-0x677ff`: Data to transfer.
+5 byte commands, possibly 1 byte if `size` and `base` are not used by the particular operation.
 
-Upon finishing a transfer, `0x67000` will be set to `0x80`
+Operations:
 
-`0x67800`: Received flag, will be set to 1 upon receiving data.<br/>
-`0x67801-0x67802`: 16-bit received counter, will be incremented upon receiving data, possible overflow after 2045.<br/>
-`0x67803-0x67fff`: Received data. Again, may overflow (overwrite).
+| op  | Meaning                                                      |
+|-----|--------------------------------------------------------------|
+| 00  | Memory read of `size` bytes starting at `base`               |
+| 01  | Memory write of `size` bytes starting at `base`              |
+| 10  | Read CPU register `{command[3], command[7:4]}` (sends 4 bytes) |
+| 11  | Start CPU execution                                          |
 
-Data is stored in the order it was received, i.e `0x67803` would be the first byte received.
-The CPU may overwrite the received counter, for example if it doesn't care about the stored data it may write 0 to it and received data will start to be overwritten.
+Notes:
 
-The UART interface is 115200 baud, the code for it is not present on this codebase, if you notice the directory specified for it in the Makefile is a link.<br/> I don't think it's relevant for this project, however the final bitstream in the `obj/` directory does contain it. I may commit that directory in the future :p.
+- Reads: FPGA streams bytes from low → high address.
+- Writes: host must send `size` additional bytes, written from `base` upward.
+- For `10` / `11`, a single byte suffices to issue the operation.
+- During CPU mode, incoming UART bytes are buffered to memory for the CPU; commands are ignored.
 
-As you may have realized the UART interface takes the last 4KiB of memory, this is because it's directly connected to the last 2 DP16KDs that the memory module uses. This makes things easier to port over if the memory size is changed, the amount of memory banks is specified in a parameter in `memory.v`.
+## MMIO UART Map
+
+The UART interface occupies the last 4 KiB of RAM (wired to the final two DP16KDs used by the memory module) to simplify porting when total memory changes.
+
+| Address Range     | Function                                                                                 |
+|-------------------|------------------------------------------------------------------------------------------|
+| 0x67000           | Start/Status flags. Set bit0=1 to start a transfer. After completion, set to `0x80`.     |
+| 0x67001–0x67002   | Transfer size (16-bit unsigned, LSB at 0x67001)                                          |
+| 0x67003–0x677FF   | TX buffer (data to send)                                                                 |
+| 0x67800           | RX flag (set to 1 when data is received)                                                 |
+| 0x67801–0x67802   | RX count (16-bit unsigned; increments per received byte; may overflow after ~2045)       |
+| 0x67803–0x67FFF   | RX buffer (received data; may wrap/overwrite)                                            |
+
+- RX bytes are ordered as received, `0x67803` holds the first byte, so are TX bytes.
+- The CPU may overwrite the RX count, e.g., write `0` so new data overwrites old.
+- Baud: 115200, see `lib/hdl/uart.v` to change baud rate.
+
+## Porting Notes
+
+- UART and clock pins: update constraints for your board on `lib/pins.lpf`
+- Memory size: set the number of DP16KD banks in `memory.v`.
+
+## Build & Run (example flow)
+
+Commands here are indicative, adapt to your repo layout and board toolchain.
+
+1) Install yosys, nextpnr-ecp5, ecppack and openFPGALoader.
+2) Configure board constraints (UART pins, clock).
+3) Synthesize, place & route, pack:
+
+       make bitstream
+
+4) Connect a serial terminal at 115200 8N1 and load/flash
+
+       make load # or make flash
+
+5) Use the host UART protocol to load your program into RAM, then issue op=11 (start).
+
+## Repository Structure
+    src/            # core, memory, mmio
+    obj/            # build artifacts (bitstream here contains the UART block)
+    lib/            # pin constraints and hdl I reuse often (UART, ALU and PLL).
+    tools/          # host-side UART loader/scripts (not yet uploaded)
+
+## Design Overview
+
+- Core: RV32I multicycle controller + ALU + regfile + memory load/store
+- Memory subsystem: parameterized DP16KD bank array (208 × 2 KiB ≈ 416 KiB ≈ ~425 KB decimal)
+- MMIO: UART mapped into the highest 4 KiB of address space
+- Boot flow: UART memory-init, send a command with `op=11` to start at PC=0
+- Utilization is roughly 7k luts. See `obj/npr_report.json` for further utilization info.
+
+## Known Limitations
+
+- No `fence/*`, `ecall`, `ebreak`, `pause`
+- No pipeline, performance is intentionally modest
+
+## Future Work
+
+- v2: 5 stage pipeline, hazard handling, wider memory datapath + burst transfers for throughput
+- v3: RV32GC
+- v4: RV64GC
+
+## Contributing
+
+Issues and PRs are welcome, especially:
+- Board port contributions
+- Verification tests/
+- 
