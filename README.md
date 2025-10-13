@@ -7,6 +7,8 @@ It's built for the ECP5 using the yosys+nextpnr toolchain, and while I've worked
 As it stands built for my particular model, it has a 425KB memory, from the on chip memory banks. 
 I've also added an MMIO UART interface for the CPU, and of course the code for the CPU is loaded onto memory via UART.
 
+I've not tested it extensively.
+
 ## Basic Functionality
 At first the FPGA will start in memory initialization mode, in this mode memory writes and reads can be done from a PC via UART. 5-byte commands may be issued to specify the desired operation (or only single byte commands if the operation is not memory related). The general form of a command is the following:
 
