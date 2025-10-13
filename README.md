@@ -1,17 +1,17 @@
 # rv32i-v1
 
-A minimal RISC-V 32-bit (RV32I) soft CPU for Lattice ECP5, written to be easy to understand and port. It currently implements the base integer ISA only (excluding memory-ordering and environment instructions: `fence`, `fence.tso`, `pause`, `ecall`, `ebreak`), hence the name.
+Personal design of a minimal RISC-V 32-bit soft CPU for Lattice ECP5, written to be easy to port and build upon. It currently implements the base integer ISA only, hence the name (excluding memory-ordering and environment instructions: `fence`, `fence.tso`, `pause`, `ecall`, `ebreak`).
 
 ## Highlights
 
 - Target: Lattice ECP5
 - Toolchain: yosys+nextpnr
 - Microarchitecture: simple multicycle, no pipeline.
-- Memory: ≈416 KiB on-chip RAM (208 × 2048-byte banks; ECP5 “DP16KD” blocks)
+- Memory: 416 KiB on-chip RAM (208 × 2048-byte banks; ECP5 “DP16KD” blocks)
 - I/O: MMIO UART (115200 baud)
-- Host link: UART-driven memory init + control protocol
+- Host link: UART driven memory init+control protocol
 
-> Developed on the ECP5 Evaluation Board (Lattice). With minor tweaks (UART pins, memory count), it should run on most ECP5 boards.
+Developed on the ECP5 Evaluation Board. With minor changes, particularly pin constraints and memory size, it should run on most ECP5 boards.
 
 ## Status / Roadmap
 
@@ -20,7 +20,7 @@ A minimal RISC-V 32-bit (RV32I) soft CPU for Lattice ECP5, written to be easy to
 - v3: ISA expansion to RV32GC
 - v4: 64-bit (RV64GC)
 
-Tested instruction-by-instruction during implementation; not yet stress-tested. Use at your own risk and please report issues.
+Tested instruction by instruction during implementation, however not yet stress-tested. Use at your own risk and please report issues.
 
 ## Basic Operation
 
@@ -49,25 +49,25 @@ Operations:
 
 Notes:
 
-- Reads: FPGA streams bytes from low → high address.
+- Reads: FPGA streams bytes from low to high address.
 - Writes: host must send `size` additional bytes, written from `base` upward.
 - For `10` / `11`, a single byte suffices to issue the operation.
-- During CPU mode, incoming UART bytes are buffered to memory for the CPU; commands are ignored.
+- During CPU mode, commands are ignored and incoming UART bytes are buffered to memory for the CPU.
 
-## MMIO UART Map
+## MMIO UART
 
-The UART interface occupies the last 4 KiB of RAM (wired to the final two DP16KDs used by the memory module) to simplify porting when total memory changes.
+The UART interface occupies the last 4 KiB of RAM (wired to the last two DP16KDs used by the memory module) to simplify porting when total memory changes.
 
 | Address Range     | Function                                                                                 |
 |-------------------|------------------------------------------------------------------------------------------|
-| 0x67000           | Start/Status flags. Set bit0=1 to start a transfer. After completion, set to `0x80`.     |
-| 0x67001–0x67002   | Transfer size (16-bit unsigned, LSB at 0x67001)                                          |
-| 0x67003–0x677FF   | TX buffer (data to send)                                                                 |
+| 0x67000           | Start/Status flags. Set bit0=1 to start a transfer. After completion, it is set to `0x80`|
+| 0x67001–0x67002   | Transfer size (16-bit unsigned, LSB at 0x67001, values greater than 2045 are ignored)    |
+| 0x67003–0x677FF   | 2045-byte TX buffer (data to send)                                                       |
 | 0x67800           | RX flag (set to 1 when data is received)                                                 |
-| 0x67801–0x67802   | RX count (16-bit unsigned; increments per received byte; may overflow after ~2045)       |
-| 0x67803–0x67FFF   | RX buffer (received data; may wrap/overwrite)                                            |
+| 0x67801–0x67802   | RX count (16-bit unsigned, increments per received byte, overflow after 2045)            |
+| 0x67803–0x67FFF   | 2045-byte RX buffer (received data, may wrap/overwrite)                                  |
 
-- RX bytes are ordered as received, `0x67803` holds the first byte, so are TX bytes.
+- RX bytes are ordered as received, i.e `0x67803` holds the first byte, and so are TX bytes.
 - The CPU may overwrite the RX count, e.g., write `0` so new data overwrites old.
 - Baud: 115200, see `lib/hdl/uart.v` to change baud rate.
 
@@ -78,10 +78,11 @@ The UART interface occupies the last 4 KiB of RAM (wired to the final two DP16KD
 
 ## Build & Run (example flow)
 
-Commands here are indicative, adapt to your repo layout and board toolchain.
+Commands here are indicative, adapt to your board toolchain. If you run them as is, without changing the Makefile or project all, a bitstream for the ECP5 Ev. Board 
+will be generated and loaded.
 
-1) Install yosys, nextpnr-ecp5, ecppack and openFPGALoader.
-2) Configure board constraints (UART pins, clock).
+1) Install yosys, nextpnr-ecp5, ecppack and openFPGALoader (or whatever tools your toolchain requires and modify Makefile).
+2) Configure board constraints (UART pins, clock, etc. on `lib/pins.lpf`).
 3) Synthesize, place & route, pack:
 
        make bitstream
