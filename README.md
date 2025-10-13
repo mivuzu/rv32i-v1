@@ -43,11 +43,11 @@ As I mentioned there's an MMIO interface for the CPU to access the UART modules,
 
 Upon finishing a transfer, `0x67000` will be set to `0x80`
 
-`0x67800`: Received flag, will be set to 1 upon receiving data.
-`0x67801-0x67802`: 16-bit received counter, will be incremented upon receiving data, possible overflow after 2045.
+`0x67800`: Received flag, will be set to 1 upon receiving data.<br/>
+`0x67801-0x67802`: 16-bit received counter, will be incremented upon receiving data, possible overflow after 2045.<br/>
 `0x67803-0x67fff`: Received data. Again, may overflow (overwrite).
 
 Data is stored in the order it was received, i.e `0x67803` would be the first byte received.
 The CPU may overwrite the received counter, for example if it doesn't care about the stored data it may write 0 to it and received data will start to be overwritten.
 
-The UART interface is 115200 baud, the code for it is not present on this codebase, if you notice the directory specified for it in the Makefile is a link. I don't think it's relevant for this project, however the final bitstream in the `obj/` directory does contain it. I may commit the module in the future :p
+The UART interface is 115200 baud, the code for it is not present on this codebase, if you notice the directory specified for it in the Makefile is a link.<br/> I don't think it's relevant for this project, however the final bitstream in the `obj/` directory does contain it. I may commit the module in the future :p along with the ALU and PLL.
