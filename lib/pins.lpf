@@ -1,0 +1,31 @@
+LOCATE COMP "dip[0]" SITE "J1";
+LOCATE COMP "dip[1]" SITE "H1";
+LOCATE COMP "dip[2]" SITE "K1";
+LOCATE COMP "dip[3]" SITE "E15";
+LOCATE COMP "dip[4]" SITE "D16";
+LOCATE COMP "dip[5]" SITE "B16";
+LOCATE COMP "dip[6]" SITE "C16";
+LOCATE COMP "dip[7]" SITE "A16";
+
+LOCATE COMP "btn[0]" SITE "P4"; # SW4
+LOCATE COMP "btn[1]" SITE "G2"; # SW2
+LOCATE COMP "btn[2]" SITE "W3"; # SW3
+
+LOCATE COMP "led[0]" SITE "A13";
+LOCATE COMP "led[1]" SITE "A12";
+LOCATE COMP "led[2]" SITE "B19";
+LOCATE COMP "led[3]" SITE "A18";
+LOCATE COMP "led[4]" SITE "B18";
+LOCATE COMP "led[5]" SITE "C17";
+LOCATE COMP "led[6]" SITE "A17";
+LOCATE COMP "led[7]" SITE "B17";
+
+# on interface B of the FTDI bridge
+LOCATE COMP "rx" SITE "P2";
+LOCATE COMP "tx" SITE "P3"; 
+#LOCATE COMP "B_2" SITE "E6"; # supposedly setting B_2=tx improves stability but it doesn't seem to matter so far
+
+#LOCATE COMP "clk" SITE "A10"; #12MHz - from USB connection
+LOCATE COMP "i_clk" SITE "A10"; #12MHz - from USB connection
+#LOCATE COMP "clk" SITE "Y19"; # LOCATE COMP "clk" SITE "W20"; # 220MHz
+#LOCATE COMP "clk" SITE "B11"; # 50MHz
