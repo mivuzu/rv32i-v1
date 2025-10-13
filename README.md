@@ -33,3 +33,21 @@ Operation `10` is rather self explanatory.
 Upon starting execution the FPGA will switch to CPU mode, executing instructions starting at address `0`, and any further commands will be ignored. Instead any data sent over UART while the CPU is executing will be stored in memory for the CPU to access, and note that the CPU may also send data of its own (see UART interface bellow). 
 
 If the CPU reaches a `0` instruction (first 7 bits are 0, most likely unwritten memory), the FPGA will switch back to memory initialization mode.
+
+## UART Interface
+As I mentioned there's an MMIO interface for the CPU to access the UART modules, it's mapped this way:
+
+`0x67000`: Start transfer flags, if first bit is set to one a transfer will start.<br/>
+`0x67001-0x67002`: Tranfer size, 16 bit unsigned integer, starting at 0x67001.<br/>
+`0x67003-0x677ff`: Data to transfer.
+
+Upon finishing a transfer, `0x67000` will be set to `0x80`
+
+`0x67800`: Received flag, will be set to 1 upon receiving data.
+`0x67801-0x67802`: 16-bit received counter, will be incremented upon receiving data, possible overflow after 2045.
+`0x67803-0x67fff`: Received data. Again, may overflow (overwrite).
+
+Data is stored in the order it was received, i.e `0x67803` would be the first byte received.
+The CPU may overwrite the received counter, for example if it doesn't care about the stored data it may write 0 to it and received data will start to be overwritten.
+
+The UART interface is 115200 baud, the code for it is not present on this codebase, if you notice the directory specified for it in the Makefile is a link. I don't think it's relevant for this project however the final bitstream of the project on the `obj/` directory does contain it of course.
