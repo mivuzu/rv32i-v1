@@ -10,7 +10,7 @@ I've also added an MMIO UART interface for the CPU, and of course the code for t
 ## Basic Functionality
 At first the FPGA will start in memory initialization mode, in this mode memory writes and reads can be done from a PC via UART. 5-byte commands may be issued to specify the desired operation (or only single byte commands if the operation is not memory related). The general form of a command is the following:
 
-\[Transfer Size (`size`) - 19 bits]|\[Base Address (`base`) - 19 bits\]|\[Operation - 2 bits\]
+\[Transfer Size (`size`) - 19 bits]|\[Base Address (`base`) - 19 bits\]|\[Operation (`op`) - 2 bits\]
 
 As you would expect there are only 4 posible operations;
 
