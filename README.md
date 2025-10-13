@@ -120,8 +120,4 @@ will be generated and loaded.
 
 ## Contributing
 
-Issues and PRs are welcome, especially:
-- Board port contributions
-- Verification tests
-- Program runs
-- Stress testing
+Issues and PRs are welcome, especially board port contributions, verification tests, program runs, and stress testing
