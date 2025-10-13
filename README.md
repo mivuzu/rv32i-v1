@@ -95,8 +95,10 @@ will be generated and loaded.
     lib/            # pin constraints and hdl I reuse often (UART, ALU and PLL).
     tools/          # host-side UART loader/scripts
 
+
 ## Porting
-If you try to run this on another board there are two main things you should change:
+If you try to run this on another board there are three main things you should change:
 
 - Memory size; set the `memblks` parameter in `memory.v` to the amount of DP16KD blocks of your particular model.
-- Pin constraints; change `lib/pins.lpf` to match the pin layout of your board. The only critical pins for the design are the UART pins and the clock, in my design the input clock is assumed to be 12MHz and then multiplied to 50MHz so bear that in mind, delete the `clk12_to_50` module to get rid of the PLL if you want.
+- Pin constraints; change `lib/pins.lpf` to match the pin layout of your board. The only critical pins for the design are the UART pins and the clock, in my design the input clock is assumed to be 12MHz and then multiplied to 50MHz so bear that in mind, delete the `clk12_to_50` module to get rid of the PLL and use the input clock as is if you want.
+- Makefile; both the exact chip model and board I used are in it :p
