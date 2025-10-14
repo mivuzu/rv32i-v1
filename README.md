@@ -100,5 +100,5 @@ will be generated and loaded.
 If you try to run this on another board there are three main things you should change:
 
 - Memory size; set the `memblks` parameter in `memory.v` to the amount of DP16KD blocks of your particular model.
-- Pin constraints; change `lib/pins.lpf` to match the pin layout of your board. The only critical pins for the design are the UART pins and the clock, in my design the input clock is assumed to be 12MHz and then multiplied to 50MHz so bear that in mind, delete the `clk12_to_50` module to get rid of the PLL and use the input clock as is if you want.
-- Makefile; both the exact chip model and board I used are in it :p
+- Pin constraints; change `lib/pins.lpf` to match the pin layout of your board. The only critical pins for the design are the UART pins and the clock, in the design the input clock is assumed to be 12MHz and then multiplied to 50MHz so bear that in mind. Delete the `clk12_to_50` module to get rid of the PLL and use the input clock as is if you wish.
+- Makefile; it's tailored to the ECP5 EVN
