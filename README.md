@@ -64,8 +64,8 @@ The UART interface occupies the last 4 KiB of RAM (wired to the last two DP16KDs
 | `0x67001–0x67002`   | Transfer size (16-bit unsigned, LSB at 0x67001, values greater than 2045 are ignored)    |
 | `0x67003–0x677FF`   | 2045-byte TX buffer (data to send)                                                       |
 | `0x67800`           | RX flag (set to 1 when data is received)                                                 |
-| `0x67801–0x67802`   | RX count (16-bit unsigned, increments per received byte, overflow after 2045)            |
-| `0x67803–0x67FFF`   | 2045-byte RX buffer (after 2045 it's set to 0 and overwrites previously stored data)     |
+| `0x67801–0x67802`   | RX count (16-bit unsigned, increments per received byte, resets after 2045)            |
+| `0x67803–0x67FFF`   | 2045-byte RX buffer (after 2045 previously stored data is overwriten)     |
 
 - RX bytes are ordered as received, i.e `0x67803` holds the first byte. TX bytes are also transferred from lowest to highest.
 - The CPU may overwrite the RX count, for example, write `0` so new data overwrites old.
