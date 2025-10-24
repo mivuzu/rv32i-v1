@@ -37,7 +37,7 @@ General bit layout of a command:
 
     [ Transfer Size (size) – 19 bits ] | [ Base Address (base) – 19 bits ] | [ Operation (op) – 2 bits ]
 
-5 byte commands, possibly 1 byte if `size` and `base` are not used by the particular operation.
+5 byte commands, possibly 1 byte if `op` is `10` or `11`.
 
 Operations:
 
@@ -50,9 +50,8 @@ Operations:
 
 Note that
 
-- For reads the FPGA streams bytes from low to high address.
-- For writes the host must send `size` additional bytes, written from `base` upward.
-- For `10` / `11`, a single byte suffices to issue the operation.
+- For reads the data is sent from low to high address.
+- For writes the host must send `size` additional bytes to complete the command, which will be written from `base` upward.
 - During CPU mode, commands are ignored and incoming UART bytes are instead buffered to memory for the CPU.
 
 ## MMIO UART
@@ -61,12 +60,12 @@ The UART interface occupies the last 4 KiB of RAM (wired to the last two DP16KDs
 
 | Address Range     | Function                                                                                 |
 |-------------------|------------------------------------------------------------------------------------------|
-| 0x67000           | Start/Status flags. Set bit0=1 to start a transfer. After completion, it is set to `0x80`|
-| 0x67001–0x67002   | Transfer size (16-bit unsigned, LSB at 0x67001, values greater than 2045 are ignored)    |
-| 0x67003–0x677FF   | 2045-byte TX buffer (data to send)                                                       |
-| 0x67800           | RX flag (set to 1 when data is received)                                                 |
-| 0x67801–0x67802   | RX count (16-bit unsigned, increments per received byte, overflow after 2045)            |
-| 0x67803–0x67FFF   | 2045-byte RX buffer (received data, may wrap/overwrite)                                  |
+| `0x67000`           | Start/Status flags. Set bit0=1 to start a transfer. After completion, it is set to `0x80`|
+| `0x67001–0x67002`   | Transfer size (16-bit unsigned, LSB at 0x67001, values greater than 2045 are ignored)    |
+| `0x67003–0x677FF`   | 2045-byte TX buffer (data to send)                                                       |
+| `0x67800`           | RX flag (set to 1 when data is received)                                                 |
+| `0x67801–0x67802`   | RX count (16-bit unsigned, increments per received byte, overflow after 2045)            |
+| `0x67803–0x67FFF`   | 2045-byte RX buffer (after 2045 it's set to 0 and overwrites previously stored data)     |
 
 - RX bytes are ordered as received, i.e `0x67803` holds the first byte. TX bytes are also transferred from lowest to highest.
 - The CPU may overwrite the RX count, for example, write `0` so new data overwrites old.
@@ -74,10 +73,10 @@ The UART interface occupies the last 4 KiB of RAM (wired to the last two DP16KDs
 
 ## Build & Run
 
-Commands here are indicative, adapt to your board toolchain. If you run them as is, without changing the Makefile or project at all, a bitstream for the ECP5 Ev. Board 
+Commands here are from the Makefile. If you run them as is, without changing the Makefile or project at all, a bitstream for the ECP5 EVN 
 will be generated and loaded.
 
-1) Install yosys, nextpnr-ecp5, ecppack and openFPGALoader (or whatever tools your toolchain requires and modify Makefile).
+1) Install yosys, nextpnr-ecp5, ecppack and openFPGALoader (or whatever tools your toolchain requires and modify the Makefile).
 2) Configure board constraints (UART pins, clock, etc. on `lib/pins.lpf`).
 3) Synthesize, place & route, pack:
 
@@ -101,4 +100,4 @@ If you try to run this on another board there are three main things you should c
 
 - Memory size; set the `memblks` parameter in `memory.v` to the amount of DP16KD blocks of your particular model.
 - Pin constraints; change `lib/pins.lpf` to match the pin layout of your board. The only critical pins for the design are the UART pins and the clock, in the design the input clock is assumed to be 12MHz and then multiplied to 50MHz so bear that in mind. Delete the `clk12_to_50` module to get rid of the PLL and use the input clock as is if you wish.
-- Makefile; it's tailored to the ECP5 EVN
+- Makefile, since it's tailored for the ECP5 EVN
