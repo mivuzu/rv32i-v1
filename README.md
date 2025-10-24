@@ -91,7 +91,7 @@ will be generated and loaded.
 ## Repository Structure
     src/            # core, memory, mmio
     obj/            # build artifacts
-    lib/            # pin constraints and hdl I reuse often (UART, ALU and PLL).
+    lib/            # pin constraints and additional hdl.
     tools/          # host-side UART loader/scripts
 
 
