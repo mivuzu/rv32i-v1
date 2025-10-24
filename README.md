@@ -6,7 +6,7 @@ I have not extensively tested it, however I tested it instruction by instruction
 
 ## Roadmap
 
-- v1 (this): RV32I, multicycle, MMIO UART, host-side memory init
+- v1 (current version): RV32I, multicycle, MMIO UART, host-side memory init
 - v2: pipelined core, wider/faster memory module
 - v3: ISA expansion to RV32GC
 - v4: 64-bit (RV64GC)
