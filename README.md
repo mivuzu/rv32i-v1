@@ -32,7 +32,6 @@ At power up the FPGA enters memory-initialization mode:
 
 ### Host Command Format
 
-Works over UART.<br/>
 General bit layout of a command:
 
     [ Transfer Size (size) – 19 bits ] | [ Base Address (base) – 19 bits ] | [ Operation (op) – 2 bits ]
