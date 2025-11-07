@@ -88,13 +88,6 @@ will be generated and loaded.
 
 5) Use the host UART protocol to load your program into RAM, then issue op=11 (start).
 
-## Repository Structure
-    src/            # core, memory, mmio
-    obj/            # build artifacts
-    lib/            # pin constraints and additional hdl.
-    tools/          # host-side UART loader/scripts
-
-
 ## Porting
 If you try to run this on another board there are three main things you should change:
 
