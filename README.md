@@ -13,7 +13,7 @@ I have not extensively tested it, however I tested it instruction by instruction
 
 ## Basic Operation
 
-At power up the FPGA enters memory-initialization mode in which a PC can read/write memory and control the CPU over UART using compact commands. Actual CPU execution can be issued with a commands as well. While executing the CPU will ignore UART commands and will instead buffer received data to particular section in memory, see MMIO UART bellow. Reaching an all-zero instruction (first 7 bits zero) will stop CPU execution and make the system return to memory-init mode, where further commands can be issued.
+At power up the FPGA enters memory-initialization mode in which a PC can read/write memory over UART. CPU execution is also be via UART. While executing the CPU will ignore UART commands and will instead buffer received data to particular section in memory, see MMIO UART bellow. Reaching an all-zero instruction (first 7 bits zero) will stop CPU execution and make the system return to memory-init mode, where further commands can be issued.
 
 ### Host Command Format
 
