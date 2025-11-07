@@ -1,6 +1,6 @@
 # rv32i-v1
 
-Minimal RISC-V 32-bit soft CPU for Lattice ECP5, first iteration, written to be easy to port and build upon. It currently implements the base integer ISA only, hence the name (excluding memory-ordering and environment instructions: `fence`, `fence.tso`, `pause`, `ecall`, `ebreak`).
+Minimal RISC-V 32-bit soft CPU for Lattice ECP5, first iteration. Only supports the base integer ISA, hence the repository name (I also didn't include memory-ordering and environment instructions: `fence`, `fence.tso`, `pause`, `ecall`, `ebreak`).
 
 I have not extensively tested it, however I tested it instruction by instruction as I wrote it and I've also run small programs, all works as expected. Still, expect errors if you try it.
 
