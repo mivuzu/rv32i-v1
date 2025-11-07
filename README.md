@@ -4,23 +4,12 @@ Minimal RISC-V 32-bit soft CPU for Lattice ECP5, first iteration. Only supports 
 
 I have not extensively tested it, however I tested it instruction by instruction as I wrote it and I've also run small programs, all works as expected. Still, expect errors if you try it.
 
-## Roadmap
+## Work for the future
 
 - v1 (current version): RV32I, multicycle, MMIO UART, host-side memory init
 - v2: pipelined core, wider/faster memory module
 - v3: ISA expansion to RV32GC
 - v4: 64-bit (RV64GC)
-
-## Summary
-
-- Target: Lattice ECP5
-- Toolchain: yosys+nextpnr
-- Microarchitecture: simple multicycle, no pipeline.
-- Memory: 416 KiB on-chip RAM (208 2048-byte memory banks; ECP5 “DP16KD” blocks)
-- I/O: MMIO UART (115200 baud)
-- Host link: UART driven memory init+control protocol
-
-Developed on the ECP5 Evaluation Board. With minor changes, particularly pin constraints and memory size, it should run on most ECP5 boards.
 
 ## Basic Operation
 
