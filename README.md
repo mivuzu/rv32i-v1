@@ -1,12 +1,12 @@
 # rv32i-v1
 
-Minimal RISC-V 32-bit soft CPU for Lattice ECP5, first iteration. Only supports the base integer ISA, hence the repository name. Memory-ordering and environment instructions `fence`, `fence.tso`, `pause`, `ecall`, `ebreak` are effetively treated as `nop`s, as are all unknown intructions with the expection of zero instructions, more on that later.
+Minimal RISC-V 32-bit soft CPU for Lattice ECP5, first iteration. Only supports the base integer ISA, hence the repository name. Memory-ordering and environment instructions `fence`, `fence.tso`, `pause`, `ecall`, `ebreak` are effetively treated as a `nop`, as are all unknown intructions with the expection of zero instructions, more on that later.
 
-As for the microachitecture it's a simple multycyle design running on a single port 8-bit memory bus, drawing heavily from the design on Sarah Harris' Digital Design and Computer Architecture. I have not extensively tested it, however all I've run on it works as expected. This is simply a personal project and it shouldn't be used for any serious particular use case, but I encourage you to test it.
+As for the microachitecture it's a simple multycyle design running on a single 8-bit memory bus, drawing heavily from the design on Sarah Harris' Digital Design and Computer Architecture. I have not extensively tested it, however all I've run on it works as expected. This is simply a personal project and it shouldn't be used for any serious use case, but I encourage you to test it.
 
 ## Basic Operation
 
-At power up the FPGA enters memory-initialization mode in which a PC can read/write memory over UART. CPU execution is also be via UART. While executing the CPU will ignore UART commands and will instead buffer received data to particular section in memory, see MMIO UART bellow. Reaching an all-zero instruction (first 7 bits zero) will stop CPU execution and make the system return to memory-init mode, where further commands can be issued.
+At power up the FPGA enters memory-initialization mode in which a PC can read/write memory over UART. CPU execution is also issued via UART in this mode. While executing the CPU will ignore UART commands and will instead buffer received data to a particular section in memory. Zero instructions (first 7 bits zero) will stop CPU execution and make the system return to memory-init mode.``
 
 ### Host Command Format
 
@@ -25,11 +25,8 @@ Operations:
 | 10  | Read CPU register `{command[3], command[7:4]}` (sends 4 bytes) |
 | 11  | Start CPU execution                                          |
 
-Note that
-
-- For reads the data is sent from low to high address.
-- For writes the host must send `size` additional bytes to complete the command, which will be written from `base` upward.
-- During CPU execution, commands are ignored and incoming UART data is instead buffered to memory for the CPU.
+Naturally, for writes the host must send `size` additional bytes to complete the command, which will be the written data.
+As mentioned before commands are ignored during CPU execution, incoming UART data will instead be buffered to memory.
 
 ## MMIO UART
 
@@ -44,8 +41,8 @@ The CPU UART interface occupies the last 4 KiB of RAM (wired to the last two DP1
 | `0x67801–0x67802`   | RX count (16-bit unsigned, increments per received byte, resets after 2045)            |
 | `0x67803–0x67FFF`   | 2045-byte RX buffer (after 2045 previously stored data is overwriten)     |
 
-- RX bytes are ordered as received, i.e `0x67803` holds the first byte. TX bytes are also transferred from lowest to highest.
-- The CPU may overwrite RX count, which results in the controller now writing data to the specified offset.
+- RX bytes are ordered as received, i.e `0x67803` holds the first byte. TX bytes are also transferred starting at `0x67003`.
+- The CPU may overwrite RX count, which results in the controller now writing data to the corresponding offset.
 - 115200 baud, 8N1. See `lib/hdl/uart.v` to change baud rate.
 
 ## Build & Run
@@ -69,8 +66,8 @@ will be generated and loaded.
 If you try to run this on another board there are three main things you should change:
 
 - Memory size; set the `memblks` parameter in `memory.v` to the amount of DP16KD blocks of your particular model.
-- Pin constraints; change `lib/pins.lpf` to match the pin layout of your board. The only critical pins for the design are the UART pins and the clock, in the design the input clock is assumed to be 12MHz and then multiplied to 50MHz so bear that in mind. Delete the `clk12_to_50` module to get rid of the PLL and use the input clock as is if you wish.
-- Makefile, since it's tailored for the ECP5 EVN
+- Pin constraints; change `lib/pins.lpf` to match the pin layout of your board. The only critical pins for the design are the UART pins and the clock. In the design the input clock is assumed to be 12MHz and then multiplied to 100MHz so bear that in mind.
+- Makefile, as some commands are particular to the ECP5 EVN.
 
 ## Work for the future
 
