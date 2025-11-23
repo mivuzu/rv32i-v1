@@ -56,8 +56,8 @@ module memory (
     rd_c=dob[memblks-1][7:0];
   end
   
-  //localparam memblks=208;
-  localparam memblks=3;
+  localparam memblks=208;
+  //localparam memblks=3;
   reg [memblks-1:0][17:0] dia,dib;
   reg [memblks-1:0][13:0] ada,adb;
   reg [memblks-1:0][2:0] csa,csb;
