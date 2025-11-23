@@ -1,31 +1,30 @@
 module main (input i_clk, input rx, input [1:0] btn, input [7:0] dip, output tx, output reg [7:0] led);
-  localparam clk_freq=50_000_000;
   wire clk;
-  clk12_to_50 u_clk (i_clk,clk);
-  //localparam clk_freq=12_000_000;
-  //wire clk=i_clk;
+  pll u_pll (.iclk12(i_clk),.clk100(clk));
+  localparam clk_freq=100_000_000;
 
-  reg state=0, _btn0=0, __btn0=0;
+  reg state=0;
+  reg [1:0] pbtn=0;
   always @(posedge clk) begin
-    _btn0<=btn[0];
-    __btn0<=_btn0;
-    if ( (__btn0 && !_btn0) || u2_cede || cpu_cede) begin
-      _btn0<=0;
-      __btn0<=0;
+    pbtn[0]<=btn[0];
+    pbtn[1]<=pbtn[0];
+    if ( (pbtn[1] && !pbtn[0]) || u2_cede || cpu_cede) begin
+      pbtn<=0;
       state<=~state;
     end
   end
+  
   wire [7:0] u0_data;
   wire u0_ready;
-  uart_r #(.CLK_FREQ(clk_freq)) u0 (clk,rx,u0_ready,u0_data);
+  uart_r #(.CLKFREQ(clk_freq)) u0 (clk,rx,u0_ready,u0_data);
 
   reg u1_en;
   reg [7:0] u1_data;
   wire u1_ready;
-  uart_t #(.CLK_FREQ(clk_freq), .WAIT_BEFORE_SAMPLING(1)) u1 (clk,u1_en,u1_data,u1_ready,tx);
+  uart_t #(.CLKFREQ(clk_freq)) u1 (clk,u1_en,u1_data,u1_ready,tx);
   
   always @* begin
-    case (state /*|| uart_wait*/)
+    case (state)
       0:begin
         u1_en=u2_tx_en;
         u1_data=u2_tx_data;
@@ -98,6 +97,8 @@ module main (input i_clk, input rx, input [1:0] btn, input [7:0] dip, output tx,
   wire [7:0] cpu_wd;
   wire [mabl-1:0] cpu_ad;
   wire [31:0] rf_rd1,instr;
+  wire [3:0] cpu_state;
+
   core u4 (
     clk,
     state,
@@ -112,15 +113,16 @@ module main (input i_clk, input rx, input [1:0] btn, input [7:0] dip, output tx,
     //// memmgr
     u2_ra1,
     rf_rd1,
-    //// led </3
-    instr
+    //// led
+    instr,
+    cpu_state
   );
+  wire [1:0] pc_sel;
+  wire pc_we,branch;
 
   wire uart_tx_en,uart_rx_we,uart_tx_we,uart_wait;
   wire [7:0] uart_tx_data,uart_rx_wd,uart_tx_wd;
   wire [smabl-1:0] uart_rx_ad,uart_tx_ad;
-  //
-  wire [3:0] uart_rx_state,uart_tx_state;
   uart u5 (
     clk,
     state&u0_ready,
@@ -137,18 +139,28 @@ module main (input i_clk, input rx, input [1:0] btn, input [7:0] dip, output tx,
     uart_tx_wd,
     uart_rx_ad,
     uart_tx_ad
-    //
-    ,uart_rx_state,uart_tx_state
   );
-  
+
   always @* led=~(
-  ~btn[1]?
-    (dip[1]?
-      uart_rx_state:
-      dip[0]?{4'b0,uart_tx_state}:{7'b0,state}):
+    ~btn[1]?{cpu_state,3'b0,state}:
     (dip[1]?
       (dip[0]?instr[31:24]:instr[23:16]):
-      (dip[0]?instr[15:8]:instr[7:0]))
+      (dip[0]?instr[15:8]:instr[7:0])
+    )
   );
+  //always @* led=~(
+  //~btn[1]?
+  //  (dip[1]?
+  //  uart_rx_state:
+  //  dip[0]?{8'b0}:{pc_sel,u3_wea,branch,cpu_state}
+  //  )
+  //  :
+  //  (dip[7]?
+  //  dip[6]?
+  //    (dip[1]?(dip[0]?prev_pc[31:24]:prev_pc[23:16]):(dip[0]?prev_pc[15:8]:prev_pc[7:0])):
+  //    (dip[1]?(dip[0]?pc[31:24]:pc[23:16]):(dip[0]?pc[15:8]:pc[7:0])):
+  //  (dip[1]?(dip[0]?instr[31:24]:instr[23:16]):(dip[0]?instr[15:8]:instr[7:0]))
+  //  )
+  //);
 
 endmodule

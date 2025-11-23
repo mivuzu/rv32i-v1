@@ -79,20 +79,17 @@ module memmgr (
             end
             2:begin
               r_stg++;
+              tx_data<=rd;
               tx_en<=1;
+              ad<=ad+1;
+              `size <= `size -1;
             end
-            3:begin
-              r_stg++;
-              tx_en<=1;
+            3: if (tx_ready) begin
               tx_data<=rd;
               ad<=ad+1;
               `size <= `size -1;
             end
-            4: if (tx_ready) begin
-              tx_data<=rd;
-              ad<=ad+1;
-              `size <= `size -1;
-            end
+            else tx_data<=rd;
           endcase
         else begin
           r_stg<=0;

@@ -23,24 +23,7 @@ module uart (
   output reg [MABL-1:0] 
     rx_ad,
     tx_ad
-  //
-  ,output [3:0]
-    rx_state,
-    tx_state
 );
-  //parameter UART_BASE=11'b0;
-  //parameter MABL=11;
-  //reg tx_en=0,wait=0,rx_we=0,tx_we=0;
-  //reg [7:0] tx_data=0,rx_wd=8'haa,tx_wd=8'h55;
-  //reg [MABL-1:0] rx_ad=0,tx_ad=0;
-
-  //always @(posedge clk) begin
-  //  if (rx_ready) begin
-  //    rx_we<=1;
-  //    rx_wd<=8'h55;
-  //  end
-  //  else if (rx_we) rx_we<=0;
-  //end
 
   parameter UART_BASE=11'b0;
   parameter MABL=11;
@@ -58,10 +41,11 @@ module uart (
       0: if (tx_rd[0]) tx_state++;
       1: tx_state++;
       2: tx_state++;
-      3: if (tx_cnt!=0 && tx_cnt<2046) tx_state++; else tx_state<=6;
-      4: if (tx_cnt!=0) tx_state++; else tx_state<=6;
-      5: if (tx_ready) tx_state<=3;
-      6: tx_state<=0;
+      3: tx_state++;
+      4: if (tx_cnt!=0 && tx_cnt<2046) tx_state++; else tx_state<=7;
+      5: if (tx_cnt!=0) tx_state++; else tx_state<=7;
+      6: if (tx_ready) tx_state<=4;
+      7: tx_state<=0;
     endcase
   end
   always @* wait=(rx_state!=0||tx_state!=0);
@@ -79,7 +63,6 @@ module uart (
   reg tx_cnt_we;
   reg [MABL-1:0] tx_cnt=0,ntx_cnt;
   always @(posedge clk) begin
-    //if (rx_ad_we) reg_rx_ad<=rx_ad;
     if (tx_ad_we) reg_tx_ad<=tx_ad;    
     if (prx_cnt_we) prx_cnt<=rx_rd;
     if (rx_cnt_we) rx_cnt<=nrx_cnt;
@@ -90,6 +73,7 @@ module uart (
   reg [1:0] tx_ad_sel;
   reg [1:0] tx_cnt_sel;
   reg [1:0] rx_wd_sel;
+  reg tx_wd_sel;
   always @* begin
     //rx_ad
     case (rx_ad_sel)
@@ -102,7 +86,6 @@ module uart (
     case (tx_ad_sel)
       0: tx_ad=UART_BASE;
       1: tx_ad=reg_tx_ad+1;
-      //2: tx_ad=reg_tx_ad;
     endcase
     // nrx_cnt
     nrx_cnt=(actual_prx_cnt<2045)?actual_prx_cnt+1:1;
@@ -121,9 +104,9 @@ module uart (
       3: rx_wd=reg_rx_data;
     endcase
     // tx_wd
-    tx_wd=8'h80;
+    tx_wd=tx_wd_sel?8'h00:8'h8e;
+    //tx_wd=8'h80;
     // tx_data
-    //tx_data={tx_cnt[10:8],tx_cnt[4:0]};
     tx_data=tx_rd;
   end
 
@@ -173,25 +156,29 @@ module uart (
     tx_ad_we=0;
     tx_cnt_we=0;
     tx_cnt_sel=0;
+    tx_wd_sel=0;
     
     case (tx_state)
       0:if (tx_rd[0]) begin
-        tx_ad_sel=1;
-        tx_ad_we=1;
+        tx_we=1;
+        tx_wd_sel=0;
       end
       1:begin
         tx_ad_sel=1;
         tx_ad_we=1;
-        tx_cnt_we=1;
       end
       2:begin
         tx_ad_sel=1;
-        //tx_ad_we=1;
+        tx_ad_we=1;
         tx_cnt_we=1;
-        tx_cnt_sel=1;
-        tx_en=1;
       end
       3:begin
+        tx_ad_sel=1;
+        tx_cnt_we=1;
+        tx_cnt_sel=1;
+        //tx_en=1;
+      end
+      4:begin
         tx_ad_sel=1;
         if (tx_cnt!=0 && tx_cnt<2046) begin
           tx_en=1;
@@ -199,20 +186,21 @@ module uart (
           tx_cnt_sel=2;
         end
       end
-      4:begin
+      5:begin
         tx_ad_sel=1;
         if (tx_cnt!=0) begin
           tx_ad_we=1;
         end
       end
-      5:begin
+      6:begin
         tx_ad_sel=1;
         if (tx_ready) tx_en=1;
       end
-      6:begin
+      7:begin
         tx_ad_sel=0;
         tx_ad_we=1;
         tx_we=1;
+        tx_wd_sel=1;
         tx_cnt_we=1;
         tx_cnt_sel=3;
       end

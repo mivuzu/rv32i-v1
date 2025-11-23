@@ -11,16 +11,19 @@ void errchk (struct ftdi_context* ftdi, int ret) {
 }
 int main (int argc, char** argv) {
   int ret;
-  if (argc>=3) {
-    unsigned int len;
-    ret=sscanf(argv[1],"%u",&len);
-    if (!ret||len>256) exit(1);
-    if (strlen(argv[2]) < len*2) exit(1);
-    unsigned char data [len];
-    for (int i=0;i<len;i++) {
-      ret=sscanf(&argv[2][len*2-i*2-2],"%02x",(int*)&data[i]);
-      if (!ret) exit(1);
+  if (argc>=2) {
+    int dlen=strlen(argv[1]);
+    if (!strncmp("0x",argv[1],2) || !strncmp("0X",argv[1],2)) {dlen=dlen-2;argv[1]=&argv[1][2];};
+    unsigned int len=dlen/2+(dlen&1);
+    unsigned char data [len]={};
+    if (dlen&1) {
+      for (int i=dlen;i>=2;i=i-2)
+        sscanf(&argv[1][i-2],"%02hhx",&data[len-i/2-1]);
+      sscanf(&argv[1][0],"%1hhx",&data[dlen/2]);
     }
+    else
+      for (int i=dlen;i>=2;i=i-2) 
+        sscanf(&argv[1][i-2],"%02hhx",&data[len-i/2]);
 
     struct ftdi_context* ftdi;
     if (!(ftdi=ftdi_new())) {
@@ -32,13 +35,17 @@ int main (int argc, char** argv) {
     errchk(ftdi,ftdi_set_baudrate(ftdi,115200));
     errchk(ftdi,ftdi_set_line_property(ftdi,BITS_8,STOP_BIT_1,NONE));
 
+    //printf("buffer: ");
+    //for (int i=0;i<len;i++) printf("%02x ",data[i]);
+    //printf("\n");
     ret=ftdi_write_data(ftdi,data,len);
-    if (argc<4 || argv[3][0]!='n') printf("%d\n",ret);
+    if (argc<3 || argv[2][0]!='n') 
+      printf("write return: %d\n",ret);
     if (ret==len) return 0;
     else return 1;
   }
   else {
-    printf("usage: %s [LEN] [DATA]\nLEN is taken as an unsigned integer, the transfer size in bytes. DATA is the actual data, formatted as a single hex numeral\n",argv[0]);
+    printf("usage: %s {DATA}\nDATA is a hex numeral containing the data to be sent, may be of any size\n",argv[0]);
     return 1;
   }
 
