@@ -9,7 +9,7 @@ As for the microachitecture it's a simple multycyle design running on a single 8
 Commands here are from the Makefile. If you run them as is, without changing the Makefile or project at all, a bitstream for the ECP5 EVN 
 will be generated and loaded.
 
-1) Install yosys, nextpnr-ecp5, ecppack and openFPGALoader and ensure you have full access to the FTDI IC, particulary, make sure your user has permissions to access it via USB, and remove the kernel module `ftdi_sio` (if attached at all) by running `sudo rmmod ftdi_sio`, as it interfers with the library used by the program loader (libftdi)
+1) Install yosys, nextpnr-ecp5, ecppack and openFPGALoader and ensure you have full access to the FTDI IC on the board, particulary, make sure your user has permissions to access it via USB, and remove the kernel module `ftdi_sio` (if attached at all) by running `sudo rmmod ftdi_sio`, as it interfers with the library used by the program loader (libftdi)
 2) Synthesize, place & route, pack:
 
        make bitstream
