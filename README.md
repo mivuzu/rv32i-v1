@@ -4,9 +4,25 @@ Minimal RISC-V 32-bit soft CPU for Lattice ECP5, first iteration. Only supports 
 
 As for the microachitecture it's a simple multycyle design running on a single 8-bit memory bus, drawing heavily from the design on Sarah Harris' Digital Design and Computer Architecture. I have not extensively tested it, however all I've run on it works as expected. This is simply a personal project and it shouldn't be used for any serious use case, but I encourage you to test it.
 
+## Build & Run
+
+Commands here are from the Makefile. If you run them as is, without changing the Makefile or project at all, a bitstream for the ECP5 EVN 
+will be generated and loaded.
+
+1) Install yosys, nextpnr-ecp5, ecppack and openFPGALoader and ensure your user has access to the FTDI IC.
+2) Synthesize, place & route, pack:
+
+       make bitstream
+
+3) Connect a serial terminal at 115200 8N1 and load/flash
+
+       make load # or make flash
+
+4) If all went well the board LEDs should now be turned off. Now you may load and run programs.
+
 ## Basic Operation
 
-At power up the FPGA enters memory-initialization mode in which a PC can read/write memory over UART. CPU execution is also issued via UART in this mode. While executing the CPU will ignore UART commands and will instead buffer received data to a particular section in memory. Zero instructions (first 7 bits zero) will stop CPU execution and make the system return to memory-init mode.``
+At power up the FPGA enters memory-initialization mode in which a PC can read/write memory over UART. CPU execution is also issued via UART in this mode. While executing the CPU will ignore UART commands and will instead buffer received data to a particular section in memory. Zero instructions (first 7 bits zero) will stop CPU execution and make the system return to memory-init mode.
 
 ### Host Command Format
 
@@ -45,25 +61,8 @@ The CPU UART interface occupies the last 4 KiB of RAM (wired to the last two DP1
 - The CPU may overwrite RX count, which results in the controller now writing data to the corresponding offset.
 - 115200 baud, 8N1. See `lib/hdl/uart.v` to change baud rate.
 
-## Build & Run
-
-Commands here are from the Makefile. If you run them as is, without changing the Makefile or project at all, a bitstream for the ECP5 EVN 
-will be generated and loaded.
-
-1) Install yosys, nextpnr-ecp5, ecppack and openFPGALoader (or whatever tools your toolchain requires and modify the Makefile).
-2) Configure board constraints (UART pins, clock, etc. on `lib/pins.lpf`).
-3) Synthesize, place & route, pack:
-
-       make bitstream
-
-4) Connect a serial terminal at 115200 8N1 and load/flash
-
-       make load # or make flash
-
-5) Use the host UART protocol to load your program into RAM, then issue op=11 (start).
-
 ## Porting
-If you try to run this on another board there are three main things you should change:
+If you try to run this on another ECP5 board there are three main things you should change:
 
 - Memory size; set the `memblks` parameter in `memory.v` to the amount of DP16KD blocks of your particular model.
 - Pin constraints; change `lib/pins.lpf` to match the pin layout of your board. The only critical pins for the design are the UART pins and the clock. In the design the input clock is assumed to be 12MHz and then multiplied to 100MHz so bear that in mind.
