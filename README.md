@@ -52,7 +52,7 @@ The CPU UART interface occupies the last 4 KiB of RAM (wired to the last two DP1
 
 | Address Range     | Function                                                                                 |
 |-------------------|------------------------------------------------------------------------------------------|
-| `0x67000`           | TX flags. Set bit0=1 to start a transfer. During transfer it's set to 0x8e and after completion to 0 |
+| `0x67000`           | TX flags. Set bit 0 to 1 to start a transfer. During transfer it's set to 0x8e and after completion to 0x00 |
 | `0x67001–0x67002`   | Transfer size (16-bit unsigned, LSB at 0x67001, values greater than 2045 are ignored)    |
 | `0x67003–0x677FF`   | 2045-byte TX buffer (data to send)                                                       |
 | `0x67800`           | RX flag (set to 1 when data is received)                                                 |
