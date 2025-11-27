@@ -15,10 +15,10 @@ will be generated and loaded.
        make bitstream
 
 3) Connect a serial terminal at 115200 8N1 and load/flash
-
+   
        make load # or make flash
-
-You may also run this command alone without running `make bitstream` first.
+   
+   You may also run this command alone without running `make bitstream` first.
 
 4) If all went well the board LEDs should now be turned off. Now you may load and run programs.
 
