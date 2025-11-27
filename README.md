@@ -18,7 +18,7 @@ will be generated and loaded.
 
        make load # or make flash
 
-   You may also run this command alone without running `make bitstream` first.
+You may also run this command alone without running `make bitstream` first.
 
 4) If all went well the board LEDs should now be turned off. Now you may load and run programs.
 
